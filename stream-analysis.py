@@ -146,14 +146,17 @@ class StreamAnalysis:
         # Simulate latency of the data stream
         plt.pause(0.1)
 
+# Parsing arguments to allow the script to run in two modes
+# The first mode is to generate random data by itself
+# The second mode is to read data from standard input (manually entered data or from a file)
 import argparse
-# parse args
 parser = argparse.ArgumentParser(description='Stream Analysis')
 parser.add_argument('--std-in-mode', action='store_true', help='Use standard input to feed data')
 args = parser.parse_args()
 
 if __name__ == "__main__":
 
+    # Create an instance of the StreamAnalysis class
     sa = StreamAnalysis()
 
     if not args.std_in_mode: # This mode will allow the script to generate random data by itself
@@ -196,3 +199,5 @@ if __name__ == "__main__":
             except ValueError:
                 print("Invalid input, skipping...")
                 continue
+
+    print("Finished")
