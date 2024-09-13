@@ -41,6 +41,9 @@ class StreamAnalysis:
         # Plot the autocorrelation values for analysis
         fig, ax = plt.subplots()
         ax.plot(lags, acv_values)
+        ax.set_title("Seasonality Analysis")
+        ax.set_xlabel("Lag")
+        ax.set_ylabel("Autocorrelation Value")
         fig.savefig(f'seasonality-analysis-output/seasonality-{index}.png')
         print("    Saved file seasonality-analysis-output/seasonality-{index}.png")
 
@@ -137,6 +140,9 @@ class StreamAnalysis:
                 max(0, len(d) - 200),
                 max(200, len(d))
             )
+            self.ax.set_title("Data Stream Analysis")
+            self.ax.set_xlabel("Time")
+            self.ax.set_ylabel("Value")
         # Simulate latency of the data stream
         plt.pause(0.1)
         
