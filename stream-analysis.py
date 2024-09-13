@@ -39,11 +39,11 @@ class StreamAnalysis:
         # Calculate the autocorrelation values
         acv_values = [pd.Series(data).autocorr(lag=lag) for lag in lags]
         # Plot the autocorrelation values for analysis
-        fig, ax = plt.subplots()
-        ax.plot(lags, acv_values)
-        ax.set_title("Seasonality Analysis")
-        ax.set_xlabel("Lag")
-        ax.set_ylabel("Autocorrelation Value")
+        fig = plt.figure()
+        plt.plot(lags, acv_values)
+        plt.title("Seasonality Analysis")
+        plt.xlabel("Lag")
+        plt.ylabel("Autocorrelation Value")
         fig.savefig(f'seasonality-analysis-output/seasonality-{index}.png')
         print("    Saved file seasonality-analysis-output/seasonality-{index}.png")
 
@@ -145,34 +145,54 @@ class StreamAnalysis:
             self.ax.set_ylabel("Value")
         # Simulate latency of the data stream
         plt.pause(0.1)
-        
+
+import argparse
+# parse args
+parser = argparse.ArgumentParser(description='Stream Analysis')
+parser.add_argument('--std-in-mode', action='store_true', help='Use standard input to feed data')
+args = parser.parse_args()
 
 if __name__ == "__main__":
-    # Step 1. Generate a random walk for SEASONAL and NOISY data
-    n = 1000                # The total number of floating-point values
-    seasonal_period = 100   # The simulated seasonality period
-    offset = 100            # The starting point of the series
-    # Generate series using a random-walk algorithm
-    random_walk = np.cumsum(np.random.randn(n))
-    time = np.arange(n)
-    # The usage of sin function allow to simulate the seasonality
-    seasonal_component = 10 * np.sin(2 * np.pi * time / seasonal_period)
-    # Combine all components
-    seasonal_random_walk = random_walk + seasonal_component + offset
-    
-    # The percentage of outliers
-    outlier_freq = 0.075
-    # Generate random indices
-    outlier_indices = np.random.randint(0, n, int(n * outlier_freq))
-    # Generate random magnitudes for each
-    outlier_magnitudes = np.random.uniform(-20, 20, int(n * outlier_freq))
-    # Apply to the series
-    for i in range(len(outlier_indices)):
-        seasonal_random_walk[outlier_indices[i]] += outlier_magnitudes[i]
 
-
-    # Step 2. Feed the data to the StreamAnalysis class
     sa = StreamAnalysis()
-    for val in seasonal_random_walk:
-        # Append a value to the data stream
-        sa.append(val)
+
+    if not args.std_in_mode: # This mode will allow the script to generate random data by itself
+
+        # Generate a random walk for SEASONAL and NOISY data
+        n = 1000                # The total number of floating-point values
+        seasonal_period = 100   # The simulated seasonality period
+        offset = 100            # The starting point of the series
+        # Generate series using a random-walk algorithm
+        random_walk = np.cumsum(np.random.randn(n))
+        time = np.arange(n)
+        # The usage of sin function allow to simulate the seasonality
+        seasonal_component = 10 * np.sin(2 * np.pi * time / seasonal_period)
+        # Combine all components
+        seasonal_random_walk = random_walk + seasonal_component + offset
+
+        # The percentage of outliers
+        outlier_freq = 0.075
+        # Generate random indices
+        outlier_indices = np.random.randint(0, n, int(n * outlier_freq))
+        # Generate random magnitudes for each
+        outlier_magnitudes = np.random.uniform(-20, 20, int(n * outlier_freq))
+        # Apply to the series
+        for i in range(len(outlier_indices)):
+            seasonal_random_walk[outlier_indices[i]] += outlier_magnitudes[i]
+
+
+        for val in seasonal_random_walk:
+            # Append a value to the data stream
+            sa.append(val)
+
+
+    if args.std_in_mode: # This mode will allow the script to read data from standard input
+        while True:
+            try:
+                val = float(input())
+                sa.append(val)
+            except EOFError:
+                break
+            except ValueError:
+                print("Invalid input, skipping...")
+                continue
