@@ -1,3 +1,7 @@
 venv
 data
 __pycache__
+backup-codes
+.idea
+concept_drift
+seasonality-analysis-output
